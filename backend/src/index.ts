@@ -1,14 +1,12 @@
-import express from "express";
+import { createApp } from "./api/app";
+import { seed } from "./data/seed";
+import { buildRepositories } from "./repositories";
 
-const app = express();
 const PORT = process.env.PORT ?? 3001;
 
-app.use(express.json());
-
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok" });
-});
+const app = createApp(buildRepositories(seed));
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`API docs at      http://localhost:${PORT}/docs`);
 });
