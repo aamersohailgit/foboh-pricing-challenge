@@ -93,6 +93,49 @@ describe("profiles CRUD", () => {
   });
 });
 
+describe("POST /api/preview", () => {
+  it("applies a scope-wide adjustment to every matching live product", async () => {
+    const res = await request(app())
+      .post("/api/preview")
+      .send({
+        scope: { kind: "segment", segment: "Sparkling" },
+        pricing: { kind: "adjustment", type: "fixed", direction: "decrease", value: 15 },
+      });
+
+    expect(res.status).toBe(200);
+    // Two live Sparkling wines: Koyama Brut (120 -> 105) and Lacourte (409.32 -> 394.32).
+    const brut = res.body.find((r: { productId: string }) => r.productId === "prod_koyama_brut");
+    expect(brut.basePrice).toBe(120);
+    expect(brut.newPrice).toBe(105);
+    expect(res.body.every((r: { newPrice: number }) => r.newPrice >= 0)).toBe(true);
+  });
+
+  it("previews a single-product override", async () => {
+    const res = await request(app())
+      .post("/api/preview")
+      .send({
+        scope: { kind: "product", productId: "prod_koyama_brut" },
+        pricing: { kind: "override", amount: 95 },
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0].newPrice).toBe(95);
+  });
+
+  it("excludes soft-deleted products from an all-products preview", async () => {
+    const res = await request(app())
+      .post("/api/preview")
+      .send({
+        scope: { kind: "all" },
+        pricing: { kind: "adjustment", type: "dynamic", direction: "decrease", value: 10 },
+      });
+    const ids = res.body.map((r: { productId: string }) => r.productId);
+    expect(ids).not.toContain("prod_koyama_pinot_gris_2017");
+    expect(res.body).toHaveLength(9);
+  });
+});
+
 describe("catalog", () => {
   it("lists products excluding the soft-deleted one", async () => {
     const res = await request(app()).get("/api/products");

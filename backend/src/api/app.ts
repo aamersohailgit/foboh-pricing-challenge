@@ -4,6 +4,7 @@ import type { Repositories } from "../repositories";
 import { buildOpenApiDocument } from "../openapi";
 import { catalogRouter } from "./catalog";
 import { errorHandler } from "./errors";
+import { previewRouter } from "./preview";
 import { profilesRouter } from "./profiles";
 import { resolveRouter } from "./resolve";
 
@@ -22,6 +23,7 @@ export function createApp(repos: Repositories): Express {
 
   app.use("/api/profiles", profilesRouter(repos.profiles));
   app.use("/api", resolveRouter(repos));
+  app.use("/api", previewRouter(repos));
   app.use("/api", catalogRouter(repos));
 
   const openApiDocument = buildOpenApiDocument();

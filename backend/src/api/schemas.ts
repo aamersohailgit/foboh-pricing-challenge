@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PricingProfileSchema } from "../domain";
+import { PricingProfileSchema, ProfilePricingSchema, ProfileScopeSchema } from "../domain";
 
 /**
  * Request body for creating/updating a profile. The server owns `id` and
@@ -25,4 +25,21 @@ export const ResolveResultSchema = z.object({
   sourceProfile: PricingProfileSchema.nullable(),
   reason: z.string(),
   appliedSteps: z.array(z.string()),
+});
+
+/** Request body for the preview endpoint: a scope + a pricing rule to apply. */
+export const PreviewRequestSchema = z.object({
+  scope: ProfileScopeSchema,
+  pricing: ProfilePricingSchema,
+});
+
+/** One row of a price preview. */
+export const PreviewRowSchema = z.object({
+  productId: z.string(),
+  title: z.string(),
+  sku: z.string(),
+  subCategory: z.string(),
+  segment: z.string(),
+  basePrice: z.number(),
+  newPrice: z.number(),
 });

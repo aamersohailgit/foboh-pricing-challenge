@@ -5,7 +5,12 @@ import {
   PricingProfileSchema,
   ProductSchema,
 } from "./domain";
-import { CreateProfileSchema, ResolveResultSchema } from "./api/schemas";
+import {
+  CreateProfileSchema,
+  PreviewRequestSchema,
+  PreviewRowSchema,
+  ResolveResultSchema,
+} from "./api/schemas";
 
 /**
  * Convert a Zod schema to an OpenAPI-3.0 schema object. Dates are
@@ -119,6 +124,17 @@ export function buildOpenApiDocument() {
           },
         },
       },
+      "/api/preview": {
+        post: {
+          tags: ["pricing"],
+          summary: "Preview the prices a scope + adjustment would produce",
+          requestBody: { required: true, content: { "application/json": { schema: ref("PreviewRequest") } } },
+          responses: {
+            "200": jsonResponse({ type: "array", items: ref("PreviewRow") }, "Preview rows"),
+            "400": jsonResponse(ref("Error"), "Validation failed"),
+          },
+        },
+      },
       "/api/products": {
         get: {
           tags: ["catalog"],
@@ -149,6 +165,8 @@ export function buildOpenApiDocument() {
         PricingProfile: toSchema(PricingProfileSchema),
         CreateProfile: toSchema(CreateProfileSchema),
         ResolveResult: toSchema(ResolveResultSchema),
+        PreviewRequest: toSchema(PreviewRequestSchema),
+        PreviewRow: toSchema(PreviewRowSchema),
         Error: {
           type: "object",
           properties: { error: { type: "string" }, details: { type: "array", items: { type: "object" } } },

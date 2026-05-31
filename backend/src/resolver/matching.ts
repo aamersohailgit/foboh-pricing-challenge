@@ -1,4 +1,4 @@
-import type { Customer, PricingProfile, Product } from "../domain";
+import type { Customer, PricingProfile, ProfileScope, Product } from "../domain";
 
 /** Does this profile's target apply to this customer? (precedence Step 1 axis) */
 export function matchesCustomer(profile: PricingProfile, customer: Customer): boolean {
@@ -11,9 +11,8 @@ export function matchesCustomer(profile: PricingProfile, customer: Customer): bo
   }
 }
 
-/** Does this profile's scope apply to this product? (precedence Step 2 axis) */
-export function matchesProduct(profile: PricingProfile, product: Product): boolean {
-  const { scope } = profile;
+/** Does a scope apply to this product? (precedence Step 2 axis) */
+export function matchesProductScope(scope: ProfileScope, product: Product): boolean {
   switch (scope.kind) {
     case "product":
       return scope.productId === product.id;
@@ -24,6 +23,11 @@ export function matchesProduct(profile: PricingProfile, product: Product): boole
     case "all":
       return true;
   }
+}
+
+/** Does this profile's scope apply to this product? */
+export function matchesProduct(profile: PricingProfile, product: Product): boolean {
+  return matchesProductScope(profile.scope, product);
 }
 
 /**
