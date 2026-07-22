@@ -31,4 +31,4 @@ Architecturally I kept things deliberately small for a 3–4 hour build: **in-me
 
 Persistence is the obvious first step — swap the in-memory `ProfileStore` for a real database behind the existing repository interface (no resolver changes needed), with profile audit history. I'd add server-side product search/filter and pagination (currently client-side, fine for ~10 products), authentication scoped to a supplier, and a richer profile editor — possibly per-product line items if the business genuinely needs hand-picked baskets with individual prices, which would mean extending the scope model and the precedence rule. Finally I'd broaden test coverage to the API error paths and add a couple of frontend component/integration tests around the builder's save flow and the Price Checker.
 
-> AI usage: this challenge was built with Claude Code (Anthropic). The full conversation transcript is at [transcripts/claude-code-session.md](transcripts/claude-code-session.md).
+
